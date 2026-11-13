@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>下一站，去哪裡？</title>
+
+  <style>
+    /* ===== 全站基本設定 ===== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #F7F5EF;
+      color: #465448;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    header {
+      padding: 25px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #91998C;
+      margin-top: 5px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 35px auto;
+      padding: 25px;
+    }
+
+    .panel {
+      background: #FFFEFA;
+      border-radius: 28px;
+      padding: 55px 45px;
+      box-shadow: 0 12px 45px #69765B12;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: #A49B7D;
+      font-size: 14px;
+      letter-spacing: 4px;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 500;
+      line-height: 1.5;
+      margin: 25px 0;
+    }
+
+    .description {
+      font-size: 21px;
+      line-height: 2;
+      color: #7E887B;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .primary {
+      background: #788B76;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 19px 50px;
+      font-size: 21px;
+      margin-top: 30px;
+    }
+
+    .primary:hover {
+      background: #586E59;
+    }
+
+    /* ===== 問題選項 ===== */
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 35px;
+    }
+
+    .option {
+      background: #F7F6F0;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 28px 15px;
+      font-size: 22px;
+      color: #526251;
+      min-height: 100px;
+      line-height: 1.6;
+    }
+
+    .option.selected {
+      border-color: #788B76;
+      background: #E9EFE6;
+    }
+
+    .hint {
+      color: #A2A394;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+
+    .progress {
+      height: 8px;
+      background: #EAE9E0;
+      border-radius: 20px;
+      margin: 25px 0;
+      overflow: hidden;
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 12.5%;
+      background: #82957D;
+      transition: width .3s;
+    }
+
+    .footer {
+      text-align: center;
+      color: #A2A394;
+      padding: 30px;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ===== 手機及小螢幕調整 ===== */
+    @media(max-width: 650px) {
+      main {
+        margin: 10px auto;
+        padding: 12px;
+      }
+
+      .panel {
+        padding: 35px 20px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .description {
+        font-size: 18px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .option {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 網站品牌 -->
+  <header>
+    <div>
+      <div class="logo">SLOW JOURNEY</div>
+      <div class="subtitle">一場關於旅行的自我探索</div>
+    </div>
+    <div class="subtitle">YOUR NEXT DESTINATION</div>
+  </header>
+
+  <main>
+
+    <!-- 首頁 -->
+    <section id="home" class="panel">
+      <div class="eyebrow">A JOURNEY TO YOUR HEART</div>
+
+      <h1>下一站，<br>去哪裡？</h1>
+
+      <p class="description">
+        世界上有很多美麗的地方。<br>
+        但總有一個地方，藏著妳此刻最嚮往的風景。<br>
+        讓我們一起找到它。
+      </p>
+
+      <button class="primary" onclick="startQuiz()">
+        開始探索 →
+      </button>
+
+      <p class="hint">約 3～5 分鐘，尋找妳的下一趟旅行</p>
+    </section>
+
+    <!-- 第一題 -->
+    <section id="question" class="panel hidden">
+
+      <div class="eyebrow">DISCOVER YOURSELF</div>
+
+      <div class="progress">
+        <div class="progress-inner" id="progressBar"></div>
+      </div>
+
+      <p class="hint" id="questionNumber">QUESTION 01</p>
+
+      <h1 id="questionTitle">妳嚮往什麼樣的世界？</h1>
+
+      <p class="description" id="questionDescription">
+        憑直覺選擇，看看哪種風景最吸引妳。
+      </p>
+
+      <div class="options" id="options"></div>
+
+      <p class="hint">可以複選，最多選擇 3 項</p>
+
+      <button class="primary" onclick="nextQuestion()">
+        下一步 →
+      </button>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    SLOW JOURNEY · 願每一段旅程，都從心出發
+  </footer>
+
+  <script>
+    // ===== 第一階段：建立測驗資料 =====
+
+    const questions = [
+      {
+        title: "妳嚮往什麼樣的世界？",
+        description: "憑直覺選擇，看看哪種風景最吸引妳。",
+        options: [
+          "A. 城市煙火：繁華、時尚、購物與夜景",
+          "B. 歷史人文：古蹟、文化與傳統建築",
+          "C. 壯麗山水：山川、湖泊與自然風景",
+          "D. 美食之都：特色料理與在地小吃"
+        ]
+      }
+    ];
+
+    // 儲存使用者選擇
+    let selectedOptions = [];
+
+    // ===== 開始測驗 =====
+    function startQuiz() {
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById("question").classList.remove("hidden");
+
+      showQuestion();
+    }
+
+    // ===== 顯示問題與選項 =====
+    function showQuestion() {
+      const question = questions[0];
+
+      document.getElementById("questionTitle").textContent =
+        question.title;
+
+      document.getElementById("questionDescription").textContent =
+        question.description;
+
+      const container = document.getElementById("options");
+
+      container.innerHTML = "";
+
+      question.options.forEach((option, index) => {
+        const button = document.createElement("button");
+
+        button.className = "option";
+
+        button.textContent = option;
+
+        // 已選取的項目顯示不同背景
+        if (selectedOptions.includes(index)) {
+          button.classList.add("selected");
+        }
+
+        // 點擊選項時切換選取狀態
+        button.onclick = function() {
+          toggleOption(index);
+        };
+
+        container.appendChild(button);
+      });
+    }
+
+    // ===== 複選功能 =====
+    function toggleOption(index) {
+      if (selectedOptions.includes(index)) {
+        selectedOptions = selectedOptions.filter(
+          item => item !== index
+        );
+      } else {
+        if (selectedOptions.length >= 3) {
+          alert("最多選擇 3 項喔！");
+          return;
+        }
+
+        selectedOptions.push(index);
+      }
+
+      showQuestion();
+    }
+
+    // ===== 下一步 =====
+    function nextQuestion() {
+      if (selectedOptions.length === 0) {
+        alert("請至少選擇一個妳喜歡的風景！");
+        return;
+      }
+
+      // 目前先確認選擇成功
+      alert(
+        "已記錄妳的選擇！\n\n" +
+        selectedOptions.map(index =>
+          questions[0].options[index]
+        ).join("\n")
+      );
+    }
+  </script>
+
+</body>
+</html>
