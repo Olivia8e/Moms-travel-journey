@@ -4,281 +4,629 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>下一站，去哪裡？</title>
+
+  <title>下一站，去哪裡？旅行探索之旅</title>
+
+  <!-- 載入適合繁體中文閱讀的字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== 全站基本設定 ===== */
+    /* 全站共用色彩與基本設定 */
+    :root {
+      --cream: #f8f6ef;
+      --green: #718b78;
+      --dark-green: #425e4a;
+      --brown: #766451;
+      --text: #514b43;
+      --light-green: #e8eee6;
+      --white: #ffffff;
+    }
+
     * {
       box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background: #F7F5EF;
-      color: #465448;
+      min-height: 100vh;
+      background: var(--cream);
+      color: var(--text);
       font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-    }
-
-    header {
-      padding: 25px 6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 21px;
-      font-weight: bold;
-      letter-spacing: 3px;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: #91998C;
-      margin-top: 5px;
-    }
-
-    main {
-      max-width: 1000px;
-      margin: 35px auto;
-      padding: 25px;
-    }
-
-    .panel {
-      background: #FFFEFA;
-      border-radius: 28px;
-      padding: 55px 45px;
-      box-shadow: 0 12px 45px #69765B12;
-      text-align: center;
-    }
-
-    .eyebrow {
-      color: #A49B7D;
-      font-size: 14px;
-      letter-spacing: 4px;
-    }
-
-    h1 {
-      font-size: 48px;
-      font-weight: 500;
-      line-height: 1.5;
-      margin: 25px 0;
-    }
-
-    .description {
-      font-size: 21px;
-      line-height: 2;
-      color: #7E887B;
+      font-size: 20px;
+      line-height: 1.8;
     }
 
     button {
-      cursor: pointer;
       font-family: inherit;
+      cursor: pointer;
     }
 
-    .primary {
-      background: #788B76;
-      color: white;
-      border: none;
-      border-radius: 50px;
-      padding: 19px 50px;
+    /* 主要內容容器 */
+    .container {
+      width: min(900px, 92%);
+      margin: 0 auto;
+      padding: 35px 0 60px;
+    }
+
+    /* 首頁及結果頁的置中版面 */
+    .center {
+      text-align: center;
+    }
+
+    /* 首頁插畫 */
+    .hero-art {
+      margin: 25px auto;
+      font-size: 85px;
+      line-height: 1.4;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      margin: 15px 0;
+      color: var(--dark-green);
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1.4;
+    }
+
+    h2 {
+      color: var(--dark-green);
+      font-size: clamp(26px, 4vw, 36px);
+      line-height: 1.5;
+    }
+
+    .intro {
+      max-width: 650px;
+      margin: 20px auto 35px;
+      color: var(--brown);
       font-size: 21px;
-      margin-top: 30px;
     }
 
-    .primary:hover {
-      background: #586E59;
+    /* 通用按鈕 */
+    .primary-btn {
+      min-width: 190px;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 40px;
+      background: var(--green);
+      color: white;
+      font-size: 21px;
+      font-weight: 700;
+      transition: 0.2s;
     }
 
-    /* ===== 問題選項 ===== */
-    .options {
+    .primary-btn:hover {
+      background: var(--dark-green);
+      transform: translateY(-2px);
+    }
+
+    .secondary-btn {
+      padding: 12px 25px;
+      border: 2px solid var(--green);
+      border-radius: 35px;
+      background: transparent;
+      color: var(--dark-green);
+      font-size: 19px;
+    }
+
+    .secondary-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* 測驗進度區域 */
+    .progress-area {
+      margin-bottom: 35px;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      color: var(--brown);
+      font-size: 17px;
+    }
+
+    .progress-track {
+      height: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #e5e2d8;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      background: var(--green);
+      transition: width 0.3s;
+    }
+
+    /* 問題卡片 */
+    .question-card {
+      padding: 35px;
+      border: 1px solid #e8e3d8;
+      border-radius: 25px;
+      background: var(--white);
+      box-shadow: 0 8px 30px rgba(80, 70, 50, 0.05);
+    }
+
+    .question-number {
+      color: var(--green);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .question-description {
+      margin: 8px 0 25px;
+      color: #8b8174;
+      font-size: 18px;
+    }
+
+    /* 選項卡片 */
+    .options-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-top: 35px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
     }
 
     .option {
-      background: #F7F6F0;
-      border: 2px solid transparent;
+      min-height: 105px;
+      padding: 20px;
+      border: 2px solid #e8e5dc;
       border-radius: 18px;
-      padding: 28px 15px;
-      font-size: 22px;
-      color: #526251;
-      min-height: 100px;
-      line-height: 1.6;
+      background: #fffefa;
+      color: var(--text);
+      text-align: left;
+      font-size: 20px;
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      border-color: var(--green);
+      background: #f5f8f3;
     }
 
     .option.selected {
-      border-color: #788B76;
-      background: #E9EFE6;
+      border-color: var(--green);
+      background: var(--light-green);
+      color: var(--dark-green);
+      font-weight: 700;
+    }
+
+    .option .emoji {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 30px;
+    }
+
+    /* 測驗操作按鈕 */
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 30px;
     }
 
     .hint {
-      color: #A2A394;
-      font-size: 16px;
+      min-height: 32px;
       margin-top: 15px;
+      color: #a16b4c;
+      font-size: 16px;
     }
 
-    .progress {
-      height: 8px;
-      background: #EAE9E0;
-      border-radius: 20px;
+    /* 結果區域 */
+    .result-card {
       margin: 25px 0;
-      overflow: hidden;
+      padding: 25px;
+      border: 1px solid #e7e1d7;
+      border-radius: 22px;
+      background: white;
+      text-align: left;
     }
 
-    .progress-inner {
-      height: 100%;
-      width: 12.5%;
-      background: #82957D;
-      transition: width .3s;
+    .rank {
+      color: var(--green);
+      font-size: 19px;
+      font-weight: 700;
     }
 
-    .footer {
-      text-align: center;
-      color: #A2A394;
-      padding: 30px;
-      font-size: 14px;
+    .destination-name {
+      margin: 5px 0;
+      color: var(--dark-green);
+      font-size: 30px;
+      font-weight: 700;
     }
 
-    .hidden {
-      display: none;
+    .result-description {
+      color: var(--brown);
+      font-size: 18px;
     }
 
-    /* ===== 手機及小螢幕調整 ===== */
-    @media(max-width: 650px) {
-      main {
-        margin: 10px auto;
-        padding: 12px;
+    .score-label {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: var(--light-green);
+      color: var(--dark-green);
+      font-size: 16px;
+    }
+
+    .result-note {
+      padding: 20px;
+      border-radius: 18px;
+      background: #f1eee6;
+      color: var(--brown);
+      font-size: 17px;
+    }
+
+    /* 小螢幕適配 */
+    @media (max-width: 600px) {
+      .container {
+        padding-top: 20px;
       }
 
-      .panel {
-        padding: 35px 20px;
+      .question-card {
+        padding: 22px 16px;
       }
 
-      h1 {
-        font-size: 34px;
-      }
-
-      .description {
-        font-size: 18px;
-      }
-
-      .options {
+      .options-grid {
         grid-template-columns: 1fr;
       }
 
       .option {
-        font-size: 20px;
+        min-height: 85px;
       }
+
+      .navigation button {
+        min-width: 0;
+        padding: 12px 18px;
+      }
+    }
+
+    /* 隱藏尚未顯示的頁面 */
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 網站品牌 -->
-  <header>
-    <div>
-      <div class="logo">SLOW JOURNEY</div>
-      <div class="subtitle">一場關於旅行的自我探索</div>
-    </div>
-    <div class="subtitle">YOUR NEXT DESTINATION</div>
-  </header>
-
-  <main>
+  <main class="container">
 
     <!-- 首頁 -->
-    <section id="home" class="panel">
-      <div class="eyebrow">A JOURNEY TO YOUR HEART</div>
+    <section id="home" class="center">
+      <div class="hero-art">☀️ 🏞️</div>
 
-      <h1>下一站，<br>去哪裡？</h1>
+      <div class="eyebrow">A JOURNEY OF DISCOVERY</div>
 
-      <p class="description">
-        世界上有很多美麗的地方。<br>
-        但總有一個地方，藏著妳此刻最嚮往的風景。<br>
-        讓我們一起找到它。
+      <h1>下一站，去哪裡？</h1>
+
+      <p class="intro">
+        每一趟旅行，都藏著一個期待中的自己。<br>
+        讓我們用幾個簡單的問題，<br>
+        一起找出最適合妳的旅行目的地。
       </p>
 
-      <button class="primary" onclick="startQuiz()">
+      <p>準備好了嗎？這趟旅程大約需要 5 分鐘。</p>
+
+      <button class="primary-btn" onclick="startQuiz()">
         開始探索 →
       </button>
-
-      <p class="hint">約 3～5 分鐘，尋找妳的下一趟旅行</p>
     </section>
 
-    <!-- 第一題 -->
-    <section id="question" class="panel hidden">
+    <!-- 問答頁 -->
+    <section id="quiz" class="hidden">
 
-      <div class="eyebrow">DISCOVER YOURSELF</div>
+      <div class="progress-area">
+        <div class="progress-text">
+          <span id="progress-label">第 1 題，共 8 題</span>
+          <span id="progress-percent">12%</span>
+        </div>
 
-      <div class="progress">
-        <div class="progress-inner" id="progressBar"></div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
       </div>
 
-      <p class="hint" id="questionNumber">QUESTION 01</p>
+      <div class="question-card">
 
-      <h1 id="questionTitle">妳嚮往什麼樣的世界？</h1>
+        <div id="question-number" class="question-number"></div>
 
-      <p class="description" id="questionDescription">
-        憑直覺選擇，看看哪種風景最吸引妳。
+        <h2 id="question-title"></h2>
+
+        <p id="question-description" class="question-description"></p>
+
+        <div id="options-container" class="options-grid"></div>
+
+        <div id="hint" class="hint"></div>
+
+        <div class="navigation">
+          <button
+            id="prev-btn"
+            class="secondary-btn"
+            onclick="previousQuestion()">
+            ← 上一題
+          </button>
+
+          <button
+            id="next-btn"
+            class="primary-btn"
+            onclick="nextQuestion()">
+            下一題 →
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 推薦結果頁 -->
+    <section id="result" class="hidden center">
+
+      <div class="hero-art">🌿 ✨ 🌿</div>
+
+      <div class="eyebrow">YOUR NEXT DESTINATION</div>
+
+      <h1>妳的旅行目的地揭曉了</h1>
+
+      <p class="intro">
+        根據妳的回答，<br>
+        我們為妳找到了三個值得期待的地方。
       </p>
 
-      <div class="options" id="options"></div>
+      <div id="result-list"></div>
 
-      <p class="hint">可以複選，最多選擇 3 項</p>
+      <div class="result-note">
+        這份推薦是根據妳的偏好所做的初步配對。
+        實際旅行仍應考慮季節、天氣、交通、預算及體力。
+      </div>
 
-      <button class="primary" onclick="nextQuestion()">
-        下一步 →
+      <br>
+
+      <button class="primary-btn" onclick="restartQuiz()">
+        再探索一次
       </button>
 
     </section>
 
   </main>
 
-  <footer class="footer">
-    SLOW JOURNEY · 願每一段旅程，都從心出發
-  </footer>
-
   <script>
-    // ===== 第一階段：建立測驗資料 =====
+    /* =========================================
+       一、建立八道題目的資料
+       type 為 multi 代表複選，single 代表單選
+       tags 代表此選項對應的旅行偏好
+       ========================================= */
 
     const questions = [
+
       {
         title: "妳嚮往什麼樣的世界？",
-        description: "憑直覺選擇，看看哪種風景最吸引妳。",
+        description: "可以選擇最多三種妳喜歡的旅行風格。",
+        type: "multi",
+        max: 3,
         options: [
-          "A. 城市煙火：繁華、時尚、購物與夜景",
-          "B. 歷史人文：古蹟、文化與傳統建築",
-          "C. 壯麗山水：山川、湖泊與自然風景",
-          "D. 美食之都：特色料理與在地小吃"
+          { text: "城市煙火：繁華、時尚、購物與夜景", emoji: "🌃", tags: ["city", "shopping", "night"] },
+          { text: "歷史人文：古蹟、文化與傳統建築", emoji: "🏯", tags: ["history", "culture"] },
+          { text: "壯麗山水：山川、湖泊與自然風景", emoji: "🏞️", tags: ["nature", "mountain", "water"] },
+          { text: "美食之都：特色料理與在地小吃", emoji: "🍜", tags: ["food", "local"] }
         ]
+      },
+
+      {
+        title: "旅行時最期待什麼？",
+        description: "選出最多兩件妳最期待的事情。",
+        type: "multi",
+        max: 2,
+        options: [
+          { text: "逛街購物，感受城市活力", emoji: "🛍️", tags: ["shopping", "city"] },
+          { text: "欣賞建築、博物館與文化", emoji: "🏛️", tags: ["culture", "history"] },
+          { text: "品嚐美食，探索在地市場", emoji: "🥢", tags: ["food", "local"] },
+          { text: "欣賞風景，拍下美麗照片", emoji: "📷", tags: ["nature", "water", "mountain"] },
+          { text: "喝茶、散步、享受悠閒時光", emoji: "🍵", tags: ["relax", "slow"] },
+          { text: "欣賞夜景與熱鬧街景", emoji: "🌙", tags: ["night", "city"] }
+        ]
+      },
+
+      {
+        title: "如果有一天完全沒有行程，妳想怎麼過？",
+        description: "選擇最接近妳理想的旅行日常。",
+        type: "single",
+        options: [
+          { text: "睡到自然醒，再慢慢逛街", emoji: "☕", tags: ["slow", "shopping", "city"] },
+          { text: "早早出門，走訪景點與古蹟", emoji: "🏯", tags: ["history", "culture"] },
+          { text: "找一個漂亮的地方看風景", emoji: "🌿", tags: ["nature", "water"] },
+          { text: "一路尋找好吃的餐廳與小吃", emoji: "🍲", tags: ["food", "local"] }
+        ]
+      },
+
+      {
+        title: "妳喜歡什麼樣的旅行節奏？",
+        description: "每個人的旅行步調都不同，選擇妳舒服的方式。",
+        type: "single",
+        options: [
+          { text: "豐富充實：每天都想探索新地方", emoji: "🚶", tags: ["active", "history", "city"] },
+          { text: "適中平衡：景點與休息都要有", emoji: "🌼", tags: ["balanced"] },
+          { text: "悠閒慢遊：不趕時間，慢慢感受", emoji: "🍵", tags: ["slow", "relax"] },
+          { text: "隨興自在：看到喜歡的地方就停留", emoji: "🦋", tags: ["flexible", "relax"] }
+        ]
+      },
+
+      {
+        title: "哪一種風景最讓妳心動？",
+        description: "最多選擇兩種，想像自己就在那個地方。",
+        type: "multi",
+        max: 2,
+        options: [
+          { text: "摩登天際線與璀璨夜景", emoji: "🌆", tags: ["city", "night"] },
+          { text: "江南水鄉與古典園林", emoji: "🏡", tags: ["water", "culture", "history"] },
+          { text: "山川河流與壯麗自然", emoji: "⛰️", tags: ["nature", "mountain", "water"] },
+          { text: "古城街道與歷史建築", emoji: "🏮", tags: ["history", "culture"] },
+          { text: "花園、湖泊與悠閒街景", emoji: "🌸", tags: ["nature", "water", "relax"] }
+        ]
+      },
+
+      {
+        title: "旅行中的美食偏好？",
+        description: "選出最多兩種妳最想體驗的飲食方式。",
+        type: "multi",
+        max: 2,
+        options: [
+          { text: "精緻餐廳與特色料理", emoji: "🍽️", tags: ["finefood"] },
+          { text: "道地小吃與街頭美食", emoji: "🥟", tags: ["food", "local"] },
+          { text: "茶館、咖啡館與甜點", emoji: "☕", tags: ["relax", "cafe"] },
+          { text: "在地市場與傳統風味", emoji: "🍜", tags: ["food", "local", "culture"] }
+        ]
+      },
+
+      {
+        title: "旅行時，妳最在意哪些事情？",
+        description: "選擇最多三項，希望旅程能避開的困擾。",
+        type: "multi",
+        max: 3,
+        options: [
+          { text: "不想走太多路，想減少體力負擔", emoji: "🪑", penalty: "walking" },
+          { text: "不喜歡人潮擁擠的地方", emoji: "👥", penalty: "crowds" },
+          { text: "不想頻繁換飯店或搬行李", emoji: "🧳", penalty: "transit" },
+          { text: "不喜歡陡坡、階梯與高低落差", emoji: "🪜", penalty: "stairs" },
+          { text: "不喜歡太熱或太冷的天氣", emoji: "🌤️", penalty: "climate" }
+        ]
+      },
+
+      {
+        title: "妳希望這趟旅行留下什麼回憶？",
+        description: "選擇最符合妳內心期待的一種。",
+        type: "single",
+        options: [
+          { text: "看見繁華城市，感受世界的精彩", emoji: "🌃", tags: ["city", "night"] },
+          { text: "走進歷史，感受文化的深度", emoji: "🏯", tags: ["history", "culture"] },
+          { text: "被美麗的大自然療癒", emoji: "🌿", tags: ["nature", "relax"] },
+          { text: "吃遍美食，享受生活的滋味", emoji: "🍜", tags: ["food", "local"] },
+          { text: "放慢腳步，好好享受每一刻", emoji: "☀️", tags: ["slow", "relax"] }
+        ]
+      }
+
+    ];
+
+    /* =========================================
+       二、建立目的地資料與風險評估
+       risks 數字越高，代表該項旅行負擔越明顯
+       ========================================= */
+
+    const destinations = [
+      {
+        name: "上海",
+        tags: ["city", "shopping", "night", "finefood", "cafe", "culture"],
+        description: "現代城市與歷史風情交織，適合喜歡購物、夜景與多元生活體驗的妳。",
+        risks: { walking: 3, crowds: 5, transit: 2, stairs: 2, climate: 3 }
+      },
+      {
+        name: "杭州",
+        tags: ["nature", "water", "relax", "slow", "cafe", "culture"],
+        description: "湖光山色與茶文化相伴，適合喜歡自然風景、悠閒步調的妳。",
+        risks: { walking: 3, crowds: 3, transit: 2, stairs: 2, climate: 3 }
+      },
+      {
+        name: "成都",
+        tags: ["food", "local", "relax", "slow", "cafe", "culture"],
+        description: "美食與慢生活交織，適合想品嚐在地料理、享受悠閒生活的妳。",
+        risks: { walking: 2, crowds: 3, transit: 2, stairs: 1, climate: 3 }
+      },
+      {
+        name: "重慶",
+        tags: ["city", "night", "food", "local", "mountain"],
+        description: "層層疊疊的山城景觀與熱鬧夜景，適合喜歡城市探索與特色美食的妳。",
+        risks: { walking: 5, crowds: 5, transit: 4, stairs: 5, climate: 4 }
+      },
+      {
+        name: "蘇州",
+        tags: ["water", "culture", "history", "slow", "relax"],
+        description: "古典園林與水鄉風情相映，適合喜歡文化、傳統建築與慢遊的妳。",
+        risks: { walking: 3, crowds: 3, transit: 2, stairs: 1, climate: 3 }
+      },
+      {
+        name: "西安",
+        tags: ["history", "culture", "food", "local"],
+        description: "千年古城與豐富飲食文化，適合喜歡歷史探索與在地美食的妳。",
+        risks: { walking: 4, crowds: 4, transit: 3, stairs: 3, climate: 4 }
+      },
+      {
+        name: "桂林",
+        tags: ["nature", "mountain", "water", "relax"],
+        description: "山水如畫，河流與喀斯特地形交織，適合喜歡自然景觀的妳。",
+        risks: { walking: 3, crowds: 3, transit: 4, stairs: 2, climate: 3 }
+      },
+      {
+        name: "昆明",
+        tags: ["nature", "relax", "slow", "water", "cafe"],
+        description: "氣候相對溫和，擁有湖泊與自然景觀，適合喜歡舒適步調的妳。",
+        risks: { walking: 3, crowds: 2, transit: 3, stairs: 2, climate: 1 }
       }
     ];
 
-    // 儲存使用者選擇
-    let selectedOptions = [];
+    /* =========================================
+       三、保存作答狀態
+       answers 的每個位置保存該題選中的選項索引
+       ========================================= */
 
-    // ===== 開始測驗 =====
+    let currentQuestion = 0;
+
+    let answers = questions.map(() => []);
+
+    /* =========================================
+       四、開始測驗
+       ========================================= */
+
     function startQuiz() {
       document.getElementById("home").classList.add("hidden");
-      document.getElementById("question").classList.remove("hidden");
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("quiz").classList.remove("hidden");
 
-      showQuestion();
+      currentQuestion = 0;
+      renderQuestion();
     }
 
-    // ===== 顯示問題與選項 =====
-    function showQuestion() {
-      const question = questions[0];
+    /* =========================================
+       五、顯示目前題目與選項
+       ========================================= */
 
-      document.getElementById("questionTitle").textContent =
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+
+      document.getElementById("question-number").textContent =
+        "QUESTION " + String(currentQuestion + 1).padStart(2, "0");
+
+      document.getElementById("question-title").textContent =
         question.title;
 
-      document.getElementById("questionDescription").textContent =
+      document.getElementById("question-description").textContent =
         question.description;
 
-      const container = document.getElementById("options");
+      /* 更新進度條 */
+      const percent = Math.round(
+        ((currentQuestion + 1) / questions.length) * 100
+      );
+
+      document.getElementById("progress-label").textContent =
+        `第 ${currentQuestion + 1} 題，共 ${questions.length} 題`;
+
+      document.getElementById("progress-percent").textContent =
+        percent + "%";
+
+      document.getElementById("progress-fill").style.width =
+        percent + "%";
+
+      /* 依據題目資料建立選項按鈕 */
+      const container = document.getElementById("options-container");
 
       container.innerHTML = "";
 
@@ -287,55 +635,240 @@
 
         button.className = "option";
 
-        button.textContent = option;
+        button.type = "button";
 
-        // 已選取的項目顯示不同背景
-        if (selectedOptions.includes(index)) {
+        button.innerHTML =
+          `<span class="emoji">${option.emoji}</span>${option.text}`;
+
+        /* 判斷這個選項是否已經被選取 */
+        if (answers[currentQuestion].includes(index)) {
           button.classList.add("selected");
         }
 
-        // 點擊選項時切換選取狀態
-        button.onclick = function() {
+        button.addEventListener("click", () => {
           toggleOption(index);
-        };
+        });
 
         container.appendChild(button);
       });
+
+      /* 第一題不顯示上一題按鈕 */
+      document.getElementById("prev-btn").disabled =
+        currentQuestion === 0;
+
+      /* 最後一題改成完成按鈕 */
+      document.getElementById("next-btn").textContent =
+        currentQuestion === questions.length - 1
+          ? "揭曉結果 ✨"
+          : "下一題 →";
+
+      document.getElementById("hint").textContent = "";
     }
 
-    // ===== 複選功能 =====
-    function toggleOption(index) {
-      if (selectedOptions.includes(index)) {
-        selectedOptions = selectedOptions.filter(
-          item => item !== index
-        );
-      } else {
-        if (selectedOptions.length >= 3) {
-          alert("最多選擇 3 項喔！");
-          return;
-        }
+    /* =========================================
+       六、處理選項選取
+       複選題依照 max 限制選取數量
+       單選題只保留一個選項
+       ========================================= */
 
-        selectedOptions.push(index);
+    function toggleOption(index) {
+      const question = questions[currentQuestion];
+
+      const selected = answers[currentQuestion];
+
+      if (question.type === "single") {
+
+        /* 單選題：再次點擊同一個選項可取消 */
+        answers[currentQuestion] =
+          selected.includes(index) ? [] : [index];
+
+      } else {
+
+        /* 複選題：已選取的選項再次點擊可取消 */
+        if (selected.includes(index)) {
+
+          answers[currentQuestion] =
+            selected.filter(item => item !== index);
+
+        } else {
+
+          /* 超過選取上限時提示使用者 */
+          if (selected.length >= question.max) {
+            document.getElementById("hint").textContent =
+              `這一題最多選擇 ${question.max} 項喔。`;
+            return;
+          }
+
+          answers[currentQuestion].push(index);
+        }
       }
 
-      showQuestion();
+      renderQuestion();
     }
 
-    // ===== 下一步 =====
+    /* =========================================
+       七、上一題與下一題
+       每一題至少需要選擇一個答案
+       ========================================= */
+
+    function previousQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    }
+
     function nextQuestion() {
-      if (selectedOptions.length === 0) {
-        alert("請至少選擇一個妳喜歡的風景！");
+      /* 防止使用者漏答 */
+      if (answers[currentQuestion].length === 0) {
+        document.getElementById("hint").textContent =
+          "先選擇一個最符合妳心意的答案吧。";
         return;
       }
 
-      // 目前先確認選擇成功
-      alert(
-        "已記錄妳的選擇！\n\n" +
-        selectedOptions.map(index =>
-          questions[0].options[index]
-        ).join("\n")
-      );
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
     }
+
+    /* =========================================
+       八、計算目的地推薦分數
+       每個偏好標籤吻合時加分
+       使用者的旅行顧慮則依目的地風險扣分
+       ========================================= */
+
+    function calculateResults() {
+
+      const results = destinations.map(destination => {
+
+        let score = 10;
+
+        let matchedTags = [];
+
+        let penalties = [];
+
+        /* 統計前六題及最後一題的偏好標籤 */
+        questions.forEach((question, questionIndex) => {
+
+          /* 第七題是旅行顧慮，不列入喜好加分 */
+          if (questionIndex === 6) return;
+
+          answers[questionIndex].forEach(optionIndex => {
+
+            const option = question.options[optionIndex];
+
+            option.tags?.forEach(tag => {
+
+              if (destination.tags.includes(tag)) {
+                score += 2;
+                matchedTags.push(tag);
+              }
+
+            });
+
+          });
+
+        });
+
+        /* 依據第七題的選擇計算風險扣分 */
+        answers[6].forEach(optionIndex => {
+
+          const option = questions[6].options[optionIndex];
+
+          const risk = destination.risks[option.penalty];
+
+          /* 風險值越高，扣分越多 */
+          const deduction = risk * 1.5;
+
+          score -= deduction;
+
+          if (risk >= 4) {
+            penalties.push(option.text);
+          }
+
+        });
+
+        return {
+          ...destination,
+          score: Math.max(0, score),
+          matchedTags: [...new Set(matchedTags)],
+          penalties
+        };
+
+      });
+
+      /* 依照總分由高到低排列 */
+      return results.sort((a, b) => b.score - a.score);
+    }
+
+    /* =========================================
+       九、顯示前三名推薦結果
+       ========================================= */
+
+    function showResults() {
+
+      const results = calculateResults();
+
+      const topThree = results.slice(0, 3);
+
+      const resultList = document.getElementById("result-list");
+
+      resultList.innerHTML = "";
+
+      topThree.forEach((destination, index) => {
+
+        const card = document.createElement("div");
+
+        card.className = "result-card";
+
+        const rankNames = ["第一名", "第二名", "第三名"];
+
+        const penaltyText = destination.penalties.length > 0
+          ? `<p>值得留意：${destination.penalties.join("、")}</p>`
+          : "";
+
+        card.innerHTML = `
+          <div class="rank">${rankNames[index]}推薦</div>
+          <div class="destination-name">${destination.name}</div>
+          <div class="result-description">${destination.description}</div>
+          <div class="score-label">偏好配對分數：${destination.score.toFixed(1)}</div>
+          ${penaltyText}
+        `;
+
+        resultList.appendChild(card);
+
+      });
+
+      document.getElementById("quiz").classList.add("hidden");
+
+      document.getElementById("result").classList.remove("hidden");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* =========================================
+       十、重新開始測驗
+       清空所有答案，回到首頁
+       ========================================= */
+
+    function restartQuiz() {
+
+      answers = questions.map(() => []);
+
+      currentQuestion = 0;
+
+      document.getElementById("result").classList.add("hidden");
+
+      document.getElementById("quiz").classList.add("hidden");
+
+      document.getElementById("home").classList.remove("hidden");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
   </script>
 
 </body>
