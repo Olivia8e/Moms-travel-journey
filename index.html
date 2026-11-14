@@ -720,11 +720,15 @@
 
     function nextQuestion() {
       /* 防止使用者漏答 */
-      if (answers[currentQuestion].length === 0) {
-        document.getElementById("hint").textContent =
-          "先選擇一個最符合妳心意的答案吧。";
-        return;
-      }
+/* 第七題是旅行顧慮，允許使用者不選任何項目 */
+if (
+  answers[currentQuestion].length === 0 &&
+  currentQuestion !== 6
+) {
+  document.getElementById("hint").textContent =
+    "先選擇一個最符合妳心意的答案吧。";
+  return;
+}
 
       if (currentQuestion < questions.length - 1) {
         currentQuestion++;
@@ -909,6 +913,7 @@ function calculateResults() {
 
 
 /* 顯示偏好吻合度、顧慮扣分與綜合分數 */
+/* 顯示推薦理由及三種分數 */
 card.innerHTML = `
   <div class="rank">${rankNames[index]}推薦</div>
 
