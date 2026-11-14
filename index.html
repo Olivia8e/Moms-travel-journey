@@ -742,66 +742,143 @@
 
     function calculateResults() {
 
-      const results = destinations.map(destination => {
 
-        let score = 10;
+/* =========================================
+   八、計算目的地推薦分數
+   分成偏好吻合度與旅行顧慮扣分兩部分
+   ========================================= */
 
-        let matchedTags = [];
+function calculateResults() {
 
-        let penalties = [];
+  /* 每一題的權重，數字越大代表影響越大 */
+  const questionWeights = [
+    1.5, // 第一題：旅行風格
+    1.5, // 第二題：旅行期待
+    1.0, // 第三題：理想的一天
+    1.5, // 第四題：旅行節奏
+    1.5, // 第五題：喜歡的風景
+    1.0, // 第六題：美食偏好
+    0,   // 第七題：旅行顧慮，獨立計算扣分
+    1.5  // 第八題：旅行回憶
+  ];
 
-        /* 統計前六題及最後一題的偏好標籤 */
-        questions.forEach((question, questionIndex) => {
+  /* 逐一計算八個目的地的分數 */
+  const results = destinations.map(destination => {
 
-          /* 第七題是旅行顧慮，不列入喜好加分 */
-          if (questionIndex === 6) return;
+    let weightedMatch = 0;
+    let totalWeight = 0;
 
-          answers[questionIndex].forEach(optionIndex => {
+    let matchedTags = [];
+    let penalties = [];
 
-            const option = question.options[optionIndex];
+    /* 第一部分：計算旅行偏好吻合度 */
+    questions.forEach((question, questionIndex) => {
 
-            option.tags?.forEach(tag => {
+      /* 第七題屬於旅行顧慮，跳過偏好加分 */
+      if (questionIndex === 6) return;
 
-              if (destination.tags.includes(tag)) {
-                score += 2;
-                matchedTags.push(tag);
-              }
+      const selectedOptions = answers[questionIndex];
 
-            });
+      /* 沒有作答的題目不納入計算 */
+      if (selectedOptions.length === 0) return;
 
-          });
+      const weight = questionWeights[questionIndex];
 
-        });
+      let optionMatches = [];
 
-        /* 依據第七題的選擇計算風險扣分 */
-        answers[6].forEach(optionIndex => {
+      selectedOptions.forEach(optionIndex => {
 
-          const option = questions[6].options[optionIndex];
+        const option = question.options[optionIndex];
 
-          const risk = destination.risks[option.penalty];
+        /* 取得此選項對應的偏好標籤 */
+        const tags = option.tags || [];
 
-          /* 風險值越高，扣分越多 */
-          const deduction = risk * 1.5;
+        if (tags.length === 0) return;
 
-          score -= deduction;
+        /* 計算這個選項與目的地的標籤重疊比例 */
+        const matchedCount = tags.filter(tag =>
+          destination.tags.includes(tag)
+        ).length;
 
-          if (risk >= 4) {
-            penalties.push(option.text);
-          }
+        const matchRate = matchedCount / tags.length;
 
-        });
+        optionMatches.push(matchRate);
 
-        return {
-          ...destination,
-          score: Math.max(0, score),
-          matchedTags: [...new Set(matchedTags)],
-          penalties
-        };
+        /* 記錄吻合度較高的選項，供結果頁解釋 */
+        if (matchRate >= 0.5) {
+          matchedTags.push(option.text);
+        }
 
       });
 
-      /* 依照總分由高到低排列 */
-      return results.sort((a, b) => b.score - a.score);
+      /* 同一題的多個答案先取平均，避免重複加分 */
+      if (optionMatches.length > 0) {
+
+        const questionMatch =
+          optionMatches.reduce((sum, value) => sum + value, 0)
+          / optionMatches.length;
+
+        weightedMatch += questionMatch * weight;
+
+        totalWeight += weight;
+      }
+
+    });
+
+    /* 將偏好吻合度轉換成 0～100 分 */
+    const preferenceScore = totalWeight > 0
+      ? (weightedMatch / totalWeight) * 100
+      : 0;
+
+    /* 第二部分：計算旅行顧慮扣分 */
+    let constraintPenalty = 0;
+
+    answers[6].forEach(optionIndex => {
+
+      const option = questions[6].options[optionIndex];
+
+      /* 讀取目的地在這項顧慮上的風險評估 */
+      const risk = destination.risks[option.penalty] ?? 1;
+
+      /*
+        風險分數為 1～5：
+        1 分不扣分，5 分扣 10 分
+        每項顧慮獨立計算
+      */
+      const deduction = (risk - 1) * 2.5;
+
+      constraintPenalty += deduction;
+
+      /* 風險達 4 分以上，列入旅行注意事項 */
+      if (risk >= 4) {
+        penalties.push(option.text);
+      }
+
+    });
+
+    /* 顧慮扣分最多 30 分，避免單一維度過度主導 */
+    constraintPenalty = Math.min(constraintPenalty, 30);
+
+    /* 第三部分：計算最終配對分數 */
+    const finalScore = Math.max(
+      0,
+      preferenceScore - constraintPenalty
+    );
+
+    return {
+      ...destination,
+      score: finalScore,
+      preferenceScore: preferenceScore,
+      constraintPenalty: constraintPenalty,
+      matchedTags: [...new Set(matchedTags)],
+      penalties: [...new Set(penalties)]
+    };
+
+  });
+
+  /* 依照最終分數由高至低排列 */
+  return results.sort((a, b) => b.score - a.score);
+
     }
 
     /* =========================================
@@ -830,13 +907,36 @@
           ? `<p>值得留意：${destination.penalties.join("、")}</p>`
           : "";
 
-        card.innerHTML = `
-          <div class="rank">${rankNames[index]}推薦</div>
-          <div class="destination-name">${destination.name}</div>
-          <div class="result-description">${destination.description}</div>
-          <div class="score-label">偏好配對分數：${destination.score.toFixed(1)}</div>
-          ${penaltyText}
-        `;
+
+/* 顯示偏好吻合度、顧慮扣分與綜合分數 */
+card.innerHTML = `
+  <div class="rank">${rankNames[index]}推薦</div>
+
+  <div class="destination-name">${destination.name}</div>
+
+  <div class="result-description">
+    ${destination.description}
+  </div>
+
+  <div class="score-label">
+    偏好吻合度：${destination.preferenceScore.toFixed(1)} 分
+  </div>
+
+  <div class="score-label">
+    旅行顧慮扣分：-${destination.constraintPenalty.toFixed(1)} 分
+  </div>
+
+  <div class="score-label">
+    綜合配對分數：${destination.score.toFixed(1)} 分
+  </div>
+
+  ${
+    destination.penalties.length > 0
+      ? `<p>值得留意：${destination.penalties.join("、")}</p>`
+      : ""
+  }
+`;
+
 
         resultList.appendChild(card);
 
